@@ -31,11 +31,17 @@ create_compendium <- function(
   # initialize the new project with useful features
   if (rstudio & open) {
 
+    license_param <- if (packageVersion("usethis") < "2.0.0") {
+      "name"
+    } else {
+      "copyright_holder"
+    }
+
     fileConn <- file(file.path(pkgname, ".Rprofile"))
     writeLines(
       c(
         # run additional commands
-        paste0("usethis::use_mit_license(copyright_holder = '", get_git_config('user.name', global = TRUE), "')"),
+        paste0("usethis::use_mit_license(", license_param, " = '", get_git_config('user.name', global = TRUE), "')"),
         "cat('\n')",
         "rrtools::use_readme_rmd(render_readme = FALSE)",
         "cat('\n')",
@@ -80,7 +86,11 @@ create_compendium <- function(
     setwd(pkgname)
 
     # run additional commands
-    usethis::use_mit_license(copyright_holder = get_git_config('user.name', global = TRUE))
+    if (packageVersion("usethis") < "2.0.0") {
+      usethis::use_mit_license(name = get_git_config('user.name', global = TRUE))
+    } else {
+      usethis::use_mit_license(copyright_holder = get_git_config('user.name', global = TRUE))
+    }
     cat('\n')
     rrtools::use_readme_rmd(render_readme = FALSE)
     cat('\n')
